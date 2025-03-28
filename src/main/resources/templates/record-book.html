@@ -16,7 +16,7 @@
 <body>
 <header th:fragment="header">
   <div class="container mt-5">
-    <img th:src="@{/favicon.png}" width="75px" />
+    <a th:href="@{/}"><img th:src="@{/favicon.png}" width="75px" /></a>
   </div>
 </header>
 <div class="container mt-5">
@@ -55,6 +55,9 @@
       </tr>
       </tbody>
     </table>
+    <a th:href="@{/record-book/add}" class="btn btn-success mb-3">
+      Добавить новую запись
+    </a>
   </div>
 </div>
 </body>

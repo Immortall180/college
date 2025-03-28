@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.nokisev.college.models.Group;
-import ru.nokisev.college.models.RecordBook;
-import ru.nokisev.college.models.Semester;
-import ru.nokisev.college.models.Student;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ru.nokisev.college.models.*;
+import ru.nokisev.college.repositories.*;
 import ru.nokisev.college.services.RecordBookService;
 
 import java.util.List;
@@ -20,6 +20,15 @@ import java.util.stream.Collectors;
 @Controller
 @RequiredArgsConstructor
 public class RecordBookController {
+    private final FacultyRepository facultyRepository;
+    private final GroupRepository groupRepository;
+    private final StudentRepository studentRepository;
+    private final RecordBookRepository recordBookRepository;
+    private final TeacherRepository teacherRepository;
+    private final SubjectRepository subjectRepository;
+    private final SemesterRepository semesterRepository;
+    public final CertificationRepository certificationRepository;
+
     private final RecordBookService recordBookService;
 
     @GetMapping("/")
@@ -71,4 +80,35 @@ public class RecordBookController {
 
         return "record-book";
     }
+
+    @PostMapping("/record-book/add")
+    public String addRecord(
+            @RequestParam Long teacherId,
+            @RequestParam Long subjectId,
+            @RequestParam Long studentId,
+            @RequestParam Long semesterId,
+            @RequestParam Long groupId,
+            @RequestParam Long certificationId,
+            @RequestParam String grade,
+            RedirectAttributes redirectAttributes) {
+
+        recordBookService.addRecord(teacherId, subjectId, studentId,
+                semesterId, groupId, certificationId,
+                grade);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Запись успешно добавлена");
+        return "redirect:/record-book?studentId=" + studentId + "&groupId=" + groupId;
+    }
+
+    @GetMapping("/record-book/add")
+    public String showAddForm(Model model) {
+        model.addAttribute("teachers", teacherRepository.findAll());
+        model.addAttribute("subjects", subjectRepository.findAll());
+        model.addAttribute("students", studentRepository.findAll());
+        model.addAttribute("semesters", semesterRepository.findAll());
+        model.addAttribute("groups", groupRepository.findAll());
+        model.addAttribute("certifications", certificationRepository.findAll());
+        return "record-book/add";
+    }
+
 }
